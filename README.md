@@ -3,7 +3,7 @@ Setly is a professional and elegant task management web application built with p
 ##Feauters
 - Clean and responsive UI with Persian (Farsi) right-to-left support  
 - Smooth and subtle animations for UI elements  
-- Simple login with username and password (default user: `user`, password: `1234`)  
+- Simple login with username and password (default user: `admin`, password: `1234`)  
 - Add, edit, delete, and reorder tasks with drag-and-drop support  
 - Tasks are saved locally in the browser's localStorage  
 - Header and footer with project branding and contact email  
