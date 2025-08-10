@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>Setly</title>
+<link rel="icon" href="images/Favicon.png" type="image/png">
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700&display=swap');
+    * {font-family: 'Vazirmatn', sans-serif; margin: 0; padding: 0; box-sizing: border-box;}
+    body {background: var(--bg); color: var(--text); transition: background 0.3s, color 0.3s;}
+    :root { --bg: #f4f4f4; --text: #333; --card: white; --primary: #4caf50; }
+    .dark { --bg: #121212; --text: #f4f4f4; --card: #1e1e1e; }
+    header, footer {background: var(--card); padding: 1rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1);}
+    main {padding: 1rem;}
+    .card {background: var(--card); padding: 1rem; margin: 0.5rem 0; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; animation: fadeIn 0.3s ease;}
+    @keyframes fadeIn {from{opacity:0; transform: translateY(10px);} to{opacity:1; transform:translateY(0);}}
+    button {padding: 0.5rem 1rem; border: none; border-radius: 6px; cursor: pointer; margin: 0 0.2rem; transition: background 0.3s;}
+    button:hover {opacity: 0.9;}
+    .primary {background: var(--primary); color: white;}
+    .danger {background: crimson; color: white;}
+    #notif {position: fixed; top: -50px; left: 50%; transform: translateX(-50%); background: #4caf50; color: white; padding: 0.7rem 1.5rem; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.3); opacity: 0; transition: all 0.4s;}
+    #notif.show {top: 20px; opacity: 1;}
+    .hidden {display: none;}
+    .tools button {font-size: 0.9rem;}
+</style>
+</head>
+<body>
+
+<div id="notif">اوکی!</div>
+
+<!-- صفحه لاگین -->
+<div id="login-page">
+    <header><h1>Setly Intro</h1></header>
+    <main>
+        <h2>ورود به سیستم</h2>
+        <input id="username" placeholder="نام کاربری"><br><br>
+        <input id="password" type="password" placeholder="رمز عبور"><br><br>
+        <button class="primary" onclick="login()">ورود</button>
+    </main>
+</div>
+
+<!-- داشبورد -->
+<div id="dashboard" class="hidden">
+<header>
+    <h1>داشبورد</h1>
+    <div>
+        <button onclick="toggleTheme()">🌓</button>
+        <button class="danger" onclick="logout()">خروج</button>
+    </div>
+</header>
+<main>
+    <div>
+        <input id="task-input" placeholder="تسک جدید...">
+        <input id="task-time" type="time">
+        <button class="primary" onclick="addTask()">افزودن</button>
+    </div>
+    <div class="tools" style="margin:10px 0;">
+        <button onclick="formatText('bold')">B</button>
+        <button onclick="formatText('underline')">U</button>
+        <button onclick="highlight()">هایلایت</button>
+        <button onclick="addLink()">🔗</button>
+        <input type="file" id="file-upload">
+    </div>
+    <div id="task-list"></div>
+    <h3>انجام شده‌ها</h3>
+    <div id="done-list"></div>
+</main>
+<footer>
+    <div>
+        <a href="https://t.me/Errorerrrr" target="_blank" title="تلگرام"><img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" width="24"></a>
+        <a href="https://github.com/f2codes" target="_blank" title="گیتهاب"><img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" width="24"></a>
+    </div>
+    <span>© 2025 Setly</span>
+</footer>
+</div>
+
+<script>
+    // تم ذخیره شده
+    if(localStorage.getItem('theme') === 'dark') document.body.classList.add('dark');
+
+    function toggleTheme(){
+        document.body.classList.toggle('dark');
+        localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
+    }
+
+    function login(){
+        let u = document.getElementById('username').value;
+        let p = document.getElementById('password').value;
+        if(u === 'admin' && p === '1234'){
+            document.getElementById('login-page').classList.add('hidden');
+            document.getElementById('dashboard').classList.remove('hidden');
+            showNotif("خوش آمدید!");
+        } else alert('نام کاربری یا رمز اشتباه است!');
+    }
+
+    function logout(){
+        document.getElementById('dashboard').classList.add('hidden');
+        document.getElementById('login-page').classList.remove('hidden');
+        showNotif("خارج شدید!");
+    }
+
+    function addTask(){
+        let txt = document.getElementById('task-input').value.trim();
+        let time = document.getElementById('task-time').value;
+        if(!txt) return;
+        let div = document.createElement('div');
+        div.className = 'card';
+        div.contentEditable = true;
+        div.innerHTML = `${txt} ${time ? '('+time+')':''} <div><button onclick="doneTask(this)">✔</button> <button class="danger" onclick="deleteTask(this)">🗑</button></div>`;
+        document.getElementById('task-list').appendChild(div);
+        document.getElementById('task-input').value = '';
+        document.getElementById('task-time').value = '';
+        showNotif("تسک اضافه شد!");
+    }
+
+    function doneTask(btn){
+        let task = btn.closest('.card');
+        document.getElementById('done-list').appendChild(task);
+        showNotif("تسک انجام شد!");
+    }
+
+    function deleteTask(btn){
+        btn.closest('.card').remove();
+        showNotif("حذف شد!");
+    }
+
+    function showNotif(msg){
+        let notif = document.getElementById('notif');
+        notif.textContent = msg;
+        notif.classList.add('show');
+        setTimeout(()=> notif.classList.remove('show'), 3000);
+    }
+
+    function formatText(cmd){
+        document.execCommand(cmd);
+    }
+    function highlight(){
+        document.execCommand('backColor', false, 'yellow');
+    }
+    function addLink(){
+        let url = prompt('آدرس لینک را وارد کنید:');
+        if(url) document.execCommand('createLink', false, url);
+    }
+</script>
+</body>
+</html>
